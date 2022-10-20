@@ -5,6 +5,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
 
+set(APP_FILES
+    app/application.h
+    app/application.cpp
+)
+
 set(UI_FILES
     ui/mainwindow.cpp
     ui/mainwindow.h
@@ -13,12 +18,13 @@ set(UI_FILES
 
 add_executable(sleeper
     main.cpp
+    ${APP_FILES}
     ${UI_FILES}
     ${RESOURCE_DIR}/resources.qrc
 )
 
 set_target_properties(sleeper PROPERTIES
-    CXX_STANDARD 11
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
 
