@@ -149,16 +149,16 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="is_reboot">
+        <widget class="QRadioButton" name="is_suspend">
          <property name="text">
-          <string>Reboot</string>
+          <string>Suspend</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="is_suspend">
+        <widget class="QRadioButton" name="is_reboot">
          <property name="text">
-          <string>Suspend</string>
+          <string>Reboot</string>
          </property>
         </widget>
        </item>
@@ -194,7 +194,7 @@
      <x>0</x>
      <y>0</y>
      <width>350</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

@@ -5,6 +5,9 @@
 #include <QDebug>
 #include <chrono>
 
+#include "app/types.h"
+#include "utils/misc.h"
+
 using namespace std::chrono_literals;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -75,7 +78,6 @@ void MainWindow::on_btn_start_clicked()
                             ui->minutes->value(),
                             ui->hours->value());
 
-    qDebug() << _interval;
     _time_updater.start();
 }
 
@@ -90,7 +92,16 @@ void MainWindow::timeout()
 {
     _time_updater.stop();
 
-    QMessageBox::information(this, "Sleep", "Sleep");
+    ShutdownDialogAction action;
+    if(ui->is_reboot->isChecked())
+        action = ShutdownDialogAction::Reboot;
+    else if(ui->is_shutdown->isChecked())
+        action = ShutdownDialogAction::Shutdown;
+    else if(ui->is_suspend->isChecked())
+        action = ShutdownDialogAction::Suspend;
+
+    Utils::Misc::shutdownComputer(action);
+
     changeActiveBtn();
 }
 
