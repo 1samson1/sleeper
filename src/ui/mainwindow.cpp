@@ -3,6 +3,9 @@
 
 #include <QMessageBox>
 #include <QDebug>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     ui->logo->setAlignment(Qt::AlignCenter);
+
+    connect(&_time_updater, &QTimer::timeout,
+            this, &MainWindow::updateTime);
+    _time_updater.setInterval(1s);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
@@ -52,7 +59,7 @@ void MainWindow::changeActiveBtn()
 
 int MainWindow::toTimeStamp(int seconds, int minutes, int hours)
 {
-    return 1000 * (seconds + minutes * 60 + hours * 3600);
+    return seconds + minutes * 60 + hours * 3600;
 }
 
 MainWindow::~MainWindow()
@@ -64,49 +71,39 @@ void MainWindow::on_btn_start_clicked()
 {
     changeActiveBtn();
 
-    connect(&_timer, &QTimer::timeout,
-            this, &MainWindow::timeout);
-    _timer.start(toTimeStamp(ui->seconds->value(),
-                             ui->minutes->value(),
-                             ui->hours->value()));
+    _interval = toTimeStamp(ui->seconds->value(),
+                            ui->minutes->value(),
+                            ui->hours->value());
 
-    connect(&_time_updater, &QTimer::timeout,
-            this, &MainWindow::updateTime);
-
-    _time_updater.start(900); // Every 900 milliseconds update time in ui
+    qDebug() << _interval;
+    _time_updater.start();
 }
 
 
 void MainWindow::on_btn_stop_clicked()
 {
     changeActiveBtn();
-    stopTimer();
+    _time_updater.stop();
 }
 
 void MainWindow::timeout()
 {
-    stopTimer();
+    _time_updater.stop();
+
     QMessageBox::information(this, "Sleep", "Sleep");
+    changeActiveBtn();
 }
 
 void MainWindow::updateTime()
 {
-    int time = _timer.remainingTime() / 1000;
+    if(_interval == 0){
+        return timeout();
+    }
+
+    --_interval;
+
+    int time = _interval;
     ui->seconds->setValue(time % 60); time /= 60;
     ui->minutes->setValue(time % 60); time /= 60;
     ui->hours->setValue(time);
-
 }
-
-void MainWindow::stopTimer()
-{
-    _timer.disconnect(&_timer, &QTimer::timeout,
-                      this, &MainWindow::timeout);
-    _timer.stop();
-
-    disconnect(&_time_updater, &QTimer::timeout,
-            this, &MainWindow::updateTime);
-    _time_updater.stop();
-}
-
-
