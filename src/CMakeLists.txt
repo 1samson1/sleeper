@@ -35,6 +35,34 @@ set_target_properties(sleeper PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
+# Compiler options
+
+if((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+    add_compile_options(
+        -Werror
+
+        -Wall
+        -Wextra
+        -Wpedantic
+
+        -Wcast-align
+        -Wcast-qual
+        -Wconversion
+        -Wctor-dtor-privacy
+        -Wenum-compare
+        -Wfloat-equal
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wredundant-decls
+        -Wsign-conversion
+        -Wsign-promo
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    add_compile_options(/W4 /WX)
+endif()
+
+
 # Libraties
 
 # FIND QT ###################################
@@ -44,7 +72,10 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets DBus REQUIRED)
 
 # link libraries
 
-target_link_libraries(sleeper PRIVATE
+target_link_libraries(sleeper PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
-    Qt::DBus
 )
+
+if(UNIX)
+    target_link_libraries(sleeper PUBLIC Qt::DBus)
+endif()
