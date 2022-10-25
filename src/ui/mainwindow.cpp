@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <chrono>
+#include <QSignalMapper>
 
 #include "app/types.h"
 #include "utils/misc.h"
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->logo->setAlignment(Qt::AlignCenter);
 
+    // Set timer
     connect(&_time_updater, &QTimer::timeout,
             this, &MainWindow::updateTime);
     _time_updater.setInterval(1s);
@@ -43,21 +45,24 @@ void MainWindow::resizeLogo()
     ui->logo->setPixmap(logo.scaled(w,h, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
-void MainWindow::changeActiveBtn()
+void MainWindow::changeEnableBtn()
 {
-    if(ui->btn_start->isEnabled())
-    {
-        ui->box_mode->setEnabled(false);
-        ui->box_time->setEnabled(false);
-        ui->btn_start->setEnabled(false);
-        ui->btn_stop->setEnabled(true);
-    }
-    else {
-        ui->box_mode->setEnabled(true);
-        ui->box_time->setEnabled(true);
-        ui->btn_start->setEnabled(true);
-        ui->btn_stop->setEnabled(false);
-    }
+    bool enable_btns = ui->btn_stop->isEnabled();
+    bool disable_btns = ui->btn_start->isEnabled();
+
+    ui->btn_start->setEnabled(enable_btns);
+    ui->btn_stop->setEnabled(disable_btns);
+
+    ui->box_action->setEnabled(enable_btns);
+    ui->box_mode->setEnabled(enable_btns);
+}
+
+void MainWindow::changeWorkMode(WorkMode mode)
+{
+    _mode = mode;
+
+    ui->box_timer->setEnabled(_mode == WorkMode::Timer);
+    ui->box_datetime->setEnabled(_mode == WorkMode::DateTime);
 }
 
 int MainWindow::toTimeStamp(int seconds, int minutes, int hours)
@@ -72,7 +77,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btn_start_clicked()
 {
-    changeActiveBtn();
+    changeEnableBtn();
 
     _interval = toTimeStamp(ui->seconds->value(),
                             ui->minutes->value(),
@@ -84,7 +89,7 @@ void MainWindow::on_btn_start_clicked()
 
 void MainWindow::on_btn_stop_clicked()
 {
-    changeActiveBtn();
+    changeEnableBtn();
     _time_updater.stop();
 }
 
@@ -102,7 +107,7 @@ void MainWindow::timeout()
 
     Utils::Misc::shutdownComputer(action);
 
-    changeActiveBtn();
+    changeEnableBtn();
 }
 
 void MainWindow::updateTime()
@@ -118,3 +123,15 @@ void MainWindow::updateTime()
     ui->minutes->setValue(time % 60); time /= 60;
     ui->hours->setValue(time);
 }
+
+void MainWindow::on_is_timer_mode_clicked()
+{
+    changeWorkMode(WorkMode::Timer);
+}
+
+
+void MainWindow::on_is_datetime_mode_clicked()
+{
+    changeWorkMode(WorkMode::DateTime);
+}
+

@@ -8,6 +8,11 @@ namespace Ui {
 class MainWindow;
 }
 
+enum class WorkMode {
+    Timer,
+    DateTime
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -29,14 +34,21 @@ private slots:
 
     void updateTime();
 
+    void on_is_timer_mode_clicked();
+
+    void on_is_datetime_mode_clicked();
+
 private:
     void resizeLogo();
-    void changeActiveBtn();
+    void changeEnableBtn();
+    void changeWorkMode(WorkMode mode);
 
     int toTimeStamp(int seconds, int minutes = 0, int hours = 0);
 
     QTimer _time_updater;
     int _interval;
+    WorkMode _mode = WorkMode::Timer;
+
     Ui::MainWindow *ui;
 };
 
