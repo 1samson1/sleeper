@@ -51,7 +51,8 @@
       <property name="styleSheet">
        <string notr="true">.QGroupBox  QGroupBox{
 	border: 0;
-}</string>
+}
+</string>
       </property>
       <property name="title">
        <string>Mode</string>
@@ -85,7 +86,7 @@
        <item>
         <widget class="QGroupBox" name="box_timer">
          <property name="styleSheet">
-          <string notr="true">margin-bottom: 5;</string>
+          <string notr="true"/>
          </property>
          <property name="title">
           <string/>
