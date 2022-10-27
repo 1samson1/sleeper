@@ -2,9 +2,10 @@
 #include "ui_mainwindow.h"
 
 #include <QMessageBox>
+#include <QDateTime>
+#include <QDateTimeEdit>
 #include <QDebug>
 #include <chrono>
-#include <QSignalMapper>
 
 #include "app/types.h"
 #include "utils/misc.h"
@@ -21,10 +22,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->logo->setAlignment(Qt::AlignCenter);
 
-    // Set timer
+    // Set time updater
     connect(&_time_updater, &QTimer::timeout,
             this, &MainWindow::updateTime);
     _time_updater.setInterval(1s);
+
+    // Set datetime
+
+    QDateTime current_dt ;
+    current_dt.setSecsSinceEpoch(QDateTime::currentDateTime().toSecsSinceEpoch() + 30);
+
+    ui->datetime->setDateTime(current_dt);
+
+    connect(ui->datetime, &QDateTimeEdit::dateTimeChanged,
+            this, &MainWindow::changeDateTime);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
@@ -62,7 +73,14 @@ void MainWindow::changeWorkMode(WorkMode mode)
     _mode = mode;
 
     ui->box_timer->setEnabled(_mode == WorkMode::Timer);
-    ui->box_datetime->setEnabled(_mode == WorkMode::DateTime);
+    ui->datetime->setEnabled(_mode == WorkMode::DateTime);
+}
+
+void MainWindow::setTimer(qint64 time)
+{
+    ui->seconds->setValue(time % 60); time /= 60;
+    ui->minutes->setValue(time % 60); time /= 60;
+    ui->hours->setValue(time);
 }
 
 int MainWindow::toTimeStamp(int seconds, int minutes, int hours)
@@ -77,15 +95,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btn_start_clicked()
 {
-    changeEnableBtn();
+    if(_mode == WorkMode::DateTime){
+        qint64 diff_time = ui->datetime->dateTime().toSecsSinceEpoch() - QDateTime::currentSecsSinceEpoch();
 
-    _interval = toTimeStamp(ui->seconds->value(),
-                            ui->minutes->value(),
-                            ui->hours->value());
+        if(diff_time < 0)
+        {
+            QMessageBox::critical(this, tr("Outdate"), tr("The date is less than the current one"));
+            return;
+        }
+    }
+
+    changeEnableBtn();
+    ui->statusbar->clearMessage();
+
+    if(_mode == WorkMode::Timer)
+    {
+        _interval = toTimeStamp(ui->seconds->value(),
+                                ui->minutes->value(),
+                                ui->hours->value());
+    }
 
     _time_updater.start();
 }
-
 
 void MainWindow::on_btn_stop_clicked()
 {
@@ -105,6 +136,7 @@ void MainWindow::timeout()
     else if(ui->is_suspend->isChecked())
         action = ShutdownDialogAction::Suspend;
 
+    ui->statusbar->showMessage(tr("Timeout"));
     Utils::Misc::shutdownComputer(action);
 
     changeEnableBtn();
@@ -112,16 +144,23 @@ void MainWindow::timeout()
 
 void MainWindow::updateTime()
 {
-    if(_interval == 0){
-        return timeout();
+    if(_mode == WorkMode::Timer){
+        if(_interval == 0){
+            return timeout();
+        }
+
+        --_interval;
+
+        setTimer(_interval);
     }
+    else {
+        qint64 diff_time = ui->datetime->dateTime().toSecsSinceEpoch() - QDateTime::currentSecsSinceEpoch();
 
-    --_interval;
-
-    int time = _interval;
-    ui->seconds->setValue(time % 60); time /= 60;
-    ui->minutes->setValue(time % 60); time /= 60;
-    ui->hours->setValue(time);
+        if(diff_time >= 0)
+            setTimer(diff_time);
+        else
+            timeout();
+    }
 }
 
 void MainWindow::on_is_timer_mode_clicked()
@@ -135,3 +174,12 @@ void MainWindow::on_is_datetime_mode_clicked()
     changeWorkMode(WorkMode::DateTime);
 }
 
+void MainWindow::changeDateTime(const QDateTime &dateTime)
+{
+    qint64 diff_time = dateTime.toSecsSinceEpoch() - QDateTime::currentSecsSinceEpoch();
+
+    if(diff_time >= 0)
+        setTimer(diff_time);
+    else
+        ui->datetime->setDateTime(QDateTime::currentDateTime());
+}

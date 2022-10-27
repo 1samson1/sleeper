@@ -31,22 +31,22 @@ protected:
 private slots:
     void on_btn_start_clicked();
     void on_btn_stop_clicked();
+    void on_is_timer_mode_clicked();
+    void on_is_datetime_mode_clicked();
 
     void updateTime();
-
-    void on_is_timer_mode_clicked();
-
-    void on_is_datetime_mode_clicked();
+    void changeDateTime(const QDateTime &dateTime);
 
 private:
     void resizeLogo();
     void changeEnableBtn();
     void changeWorkMode(WorkMode mode);
+    void setTimer(qint64 time);
 
     int toTimeStamp(int seconds, int minutes = 0, int hours = 0);
 
     QTimer _time_updater;
-    int _interval;
+    qint64 _interval;
     WorkMode _mode = WorkMode::Timer;
 
     Ui::MainWindow *ui;

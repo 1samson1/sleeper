@@ -48,6 +48,11 @@
     </item>
     <item>
      <widget class="QGroupBox" name="box_mode">
+      <property name="styleSheet">
+       <string notr="true">.QGroupBox  QGroupBox{
+	border: 0;
+}</string>
+      </property>
       <property name="title">
        <string>Mode</string>
       </property>
@@ -56,16 +61,16 @@
         <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>4</number>
+        <number>9</number>
        </property>
        <property name="topMargin">
-        <number>4</number>
+        <number>9</number>
        </property>
        <property name="rightMargin">
-        <number>4</number>
+        <number>9</number>
        </property>
        <property name="bottomMargin">
-        <number>4</number>
+        <number>5</number>
        </property>
        <item>
         <widget class="QRadioButton" name="is_timer_mode">
@@ -79,6 +84,9 @@
        </item>
        <item>
         <widget class="QGroupBox" name="box_timer">
+         <property name="styleSheet">
+          <string notr="true">margin-bottom: 5;</string>
+         </property>
          <property name="title">
           <string/>
          </property>
@@ -87,16 +95,16 @@
            <number>10</number>
           </property>
           <property name="leftMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>5</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QSpinBox" name="hours">
@@ -183,30 +191,13 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="box_datetime">
+        <widget class="QDateTimeEdit" name="datetime">
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="title">
-          <string/>
+         <property name="displayFormat">
+          <string>dd/MM/yyyy HH:mm:ss</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="leftMargin">
-           <number>5</number>
-          </property>
-          <property name="topMargin">
-           <number>5</number>
-          </property>
-          <property name="rightMargin">
-           <number>5</number>
-          </property>
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item>
-           <widget class="QDateTimeEdit" name="dateTimeEdit"/>
-          </item>
-         </layout>
         </widget>
        </item>
       </layout>
